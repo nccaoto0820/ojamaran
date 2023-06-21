@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 public class Goal : MonoBehaviour
 {
@@ -20,6 +21,7 @@ public class Goal : MonoBehaviour
     [SerializeField, Header("ゲームオーバー音")] private AudioClip clip2;
     private EventSystem ES;
     [SerializeField] private GameObject Text;
+    [SerializeField] private string GoalScenes;
 
     //チュートリアル
     [SerializeField] public GameObject tuto;
@@ -29,18 +31,19 @@ public class Goal : MonoBehaviour
     {
         if (collision.gameObject.tag == "Player")
         {
-            goalUI.GetComponent<Text>();
-            goalUI.SetActive(true);
-            botton.SetActive(true);
-            title.SetActive(true);
-            Player.SetActive(false);
-            Partner.SetActive(false);
-            tutorialtext.goalText = true;
+            SceneManager.LoadScene(GoalScenes);
+            //goalUI.GetComponent<Text>();
+            //goalUI.SetActive(true);
+            //botton.SetActive(true);
+            //title.SetActive(true);
+            //Player.SetActive(false);
+            //Partner.SetActive(false);
+            //tutorialtext.goalText = true;
             
-            enemy.SetActive(false);
-            sound.PlayOneShotSound(clip);  //クリア音 
-            sound.BGM_Stop();   //　BGMを止める 
-            EventSystem.current.SetSelectedGameObject(Text);
+            //enemy.SetActive(false);
+            //sound.PlayOneShotSound(clip);  //クリア音 
+            //sound.BGM_Stop();   //　BGMを止める 
+            //EventSystem.current.SetSelectedGameObject(Text);
             
         }
         if (collision.gameObject.tag == "partner")
