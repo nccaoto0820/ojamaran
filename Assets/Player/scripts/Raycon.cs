@@ -27,7 +27,7 @@ public class Raycon : MonoBehaviour
 
     void Start()
     {
-        //恥ずかしい
+      
         rb = Parther.GetComponent<Rigidbody2D>();
         col = Parther.GetComponent<Collider2D>();
         aniani = GetComponent<Animator>();
@@ -43,11 +43,7 @@ public class Raycon : MonoBehaviour
         Vector2 direction = new Vector2(1, 0);  //x軸方向を表すベクトル
         Ray2D ray2D = new Ray2D(transform.position, direction);
         Debug.DrawRay(transform.position, ray2D.direction , Color.red, 0.5f);
-
-        
-
-        
-                                                                                            //Ray長さ
+                                                                        //Ray長さ
         RaycastHit2D hit = Physics2D.Raycast((Vector2)ray2D.origin, (Vector2)ray2D.direction,0.5f);
 
         
@@ -57,7 +53,7 @@ public class Raycon : MonoBehaviour
         if (hit.collider.CompareTag("jama") && isJump&&hit.collider.isTrigger==false|| hit.collider.CompareTag("jamaGround") && isJump )
         {
            
-            if (parther.Instances.time >= 3)
+            if (partner.Instances.time >= 3)
             {
 
                 if (toka == true)
@@ -68,7 +64,7 @@ public class Raycon : MonoBehaviour
                     
                     
 
-                    if (numberm <= 85)
+                    if (numberm <= 85)  
                     {
                         // 速度をクリアして2回目のジャンプも1回目と同じ挙動にする。
                         rb.velocity = Vector3.zero;
@@ -93,7 +89,7 @@ public class Raycon : MonoBehaviour
         if (hit.collider.CompareTag("needle") && isJump && hit.collider.isTrigger == false)
         {
 
-            if (parther.Instances.time >= 3)
+            if (partner.Instances.time >= 3)
             {
 
                 if (toka == true)

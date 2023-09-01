@@ -6,52 +6,69 @@ using UnityEngine.UI;
 
 public class Playercontroller : MonoBehaviour
 {
-    [SerializeField] private float speed;
-    [SerializeField] private float gravity;
+    //-------プレイヤー-------
+    [SerializeField, Header("プレイヤー")] private GameObject player;
+    [SerializeField, Header("パートナー")] private GameObject partner;
+    [SerializeField, Header("プレイヤースピード")] private float speed;
+    [SerializeField, Header("重力")] private float gravity;
+    [SerializeField, Header("ジャンプ力")] private float jumpForce; 
+    public int jumpCount = 0;//ジャンプカウント
     [SerializeField] GroundCheck ground;
-    private string groundTag = "Ground";
-    private bool isGroundEnter, isGroundStay, isGroundExit;
+    private Rigidbody2D rb = null;
+    public static Playercontroller Instance;
     private Animator anim = null;
+    float xspeed = 0.0f;
+    float yspeed = 0.0f;
 
-    [SerializeField] private GameObject shot; //shotプレハブを格納
-    [SerializeField] private Transform attackPoint;//アタックポイントを格納
-    [SerializeField] private Transform attackPoint2;//アタックポイントを格納
-
-    [SerializeField] public float attackTime = 0.2f; //攻撃の間隔
-    private float currentAttackTime; //攻撃の間隔を管理
-    public bool canAttack; //攻撃可能状態かを指定するフラグ
+    //-------アタック-------
+    [SerializeField, Header("SHOTプレハブ")] private GameObject shot; 
+    [SerializeField, Header("アタックポイント")] private Transform attackPoint;
+    [SerializeField, Header("アタックポイント2")] private Transform attackPoint2;
+    [SerializeField, Header("攻撃の間隔")] public float attackTime = 0.2f; 
+    //攻撃の間隔を管理
+    private float currentAttackTime;
+    //攻撃可能状態かを指定するフラグ
+    public bool canAttack;
+    //当たった回数
+    public static int HitCount = 0;　　
 
     [SerializeField] private Text TimeText;
     [SerializeField] private static float CountDownTime;
 
-
-    //ジャンプカウント
-    [SerializeField]private float jumpForce;
-    public int jumpCount=0;
-
-    private Rigidbody2D rb = null;
     private bool isGround=false;
     private bool topspeed = false;
-    private bool badspped = false;
-    public static Playercontroller Instance;
+    private bool badspped = false;   
     public bool change = false;
-
     public float time;
-
     public bool right;
-
     public GameObject fall;
-
-    [SerializeField]private GameObject partner;
-    [SerializeField] private GameObject player;
-    [SerializeField, Header("ワープ場所")] private GameObject []warppos;
+    
+    [SerializeField, Header("ワープ場所")] private GameObject[] warppos;
     private float distancewarp;  //ワープ時の距離
     [SerializeField] private float warpspeed;
-    //[SerializeField] private GameObject Startbutton;
+    
     public bool start = false;
+    private BoxCollider2D bc;
+
+    //壁、球クールタイムUI
+    [SerializeField] private Timer booltimer;
+    [SerializeField] private Timer walltimer;
+    private bool Starttimer=true;
+
+
+    //-------アイテム-------
     private GameObject Item1;
     private GameObject Item2;
     private GameObject Item3;
+   
+
+    
+
+    //[SerializeField] private GameObject Startbutton;
+    //private string groundTag = "Ground";
+    //private bool isGroundEnter, isGroundStay, isGroundExit;
+
+    //-------音-------
     [SerializeField, Header("ジャンプ音")] private AudioClip clip;
     [SerializeField, Header("ぶつかる音")] private AudioClip clip2;
     [SerializeField, Header("発射音")] private AudioClip clip3;
@@ -60,11 +77,7 @@ public class Playercontroller : MonoBehaviour
     [SerializeField, Header("サウンドコントローラー")] private SoundController sound;
     protected AudioSource _source;
 
-    private BoxCollider2D bc;
-
-    [SerializeField] private Timer timer;
-
-    //チュートリアル
+    //-------チュートリアル-------
     public bool canjump;
     private bool ONGround=false;
     public bool cantext=true;
@@ -74,7 +87,6 @@ public class Playercontroller : MonoBehaviour
     private bool one2 = true;
     public bool rightShot = false;
     public bool leftShot = false;
-
     [SerializeField] public GameObject tuto;
     public TutorialText tutorialtext;
    
@@ -91,73 +103,31 @@ public class Playercontroller : MonoBehaviour
     
     void Update()
     {
-
         if (start == true)
+
         {
+            
             //接地判定
             isGround = ground.IsGround();
-
-            float xspeed = 0.0f;
-
-            float yspeed = -gravity;
+            yspeed = -gravity;
             xspeed = speed;
-
             time += Time.deltaTime;
             if (time >= 3)
             {
-                if (topspeed == true)
+                Speed();
+                if (Starttimer)
                 {
-                    rb.velocity = new Vector2(xspeed + 4, rb.velocity.y);
-                    
-                    anim.SetBool("hit", false);
-                    StartCoroutine("Tspeed");
-                   
-
-                }
-                else if(badspped == true)
-                {
-                    rb.velocity = new Vector2(xspeed -3, rb.velocity.y);
-                    StartCoroutine("Badspeed");
-                }
-                else
-                {
-                    rb.velocity = new Vector2(xspeed, rb.velocity.y);
-                    anim.SetBool("hit", false);
-                    
+                    booltimer.StartTimer();
+                    walltimer.StartTimer();
+                    Starttimer=false;
+                    Debug.Log("a");
                 }
             }
             else
-            {
-
-            }
+            {}
+            ItemDestroy();
             
-            if (parther.Instances.changes == true)
-            {
-                
-                Item2 = GameObject.Find("Item2(Clone)");
-
-               
-                parther.Instances.changes = false;
-                
-                Destroy(Item2);
-            }
-            
-
-            attackTime += Time.deltaTime;
-            if (attackTime > currentAttackTime)
-            {
-                canAttack = true;
-                
-            }
-            if(canAttack==false)
-            {
-                TimeText.text = string.Format("クールタイム:{0:0}", CountDownTime);
-                CountDownTime -= Time.deltaTime;
-            }
-            else
-            {
-                TimeText.text = string.Format("let go", CountDownTime);
-            }
+            Canon();
 
             if(rb.velocity.y<0)
             {
@@ -165,11 +135,64 @@ public class Playercontroller : MonoBehaviour
                 anim.SetBool("doublejump", false);
                 anim.SetBool("fall", true);
             }
-            
-            
+        }
+    }
+    private void Speed()
+    {
+        if (topspeed == true)//トップスピード
+        {
+            rb.velocity = new Vector2(xspeed + 4, rb.velocity.y);
+
+            anim.SetBool("hit", false);
+            StartCoroutine("Tspeed");
+
+
+        }
+        else if (badspped == true)//足が遅くなる
+        {
+            rb.velocity = new Vector2(xspeed - 3, rb.velocity.y);
+            StartCoroutine("Badspeed");
+        }
+        else
+        {
+            rb.velocity = new Vector2(xspeed, rb.velocity.y);
+            anim.SetBool("hit", false);
+
         }
     }
 
+    private void Canon()
+    {
+        attackTime += Time.deltaTime;
+        if (attackTime > currentAttackTime)
+        {
+            canAttack = true;
+
+        }
+        if (canAttack == false)
+        {
+            TimeText.text = string.Format("クールタイム:{0:0}", CountDownTime);
+            CountDownTime -= Time.deltaTime;
+        }
+        else
+        {
+            TimeText.text = string.Format("let go", CountDownTime);
+        }
+    }
+
+    private void ItemDestroy()
+    {
+        if (global::partner.Instances.changes == true)
+        {
+
+            Item2 = GameObject.Find("Item2(Clone)");
+
+
+            global::partner.Instances.changes = false;
+
+            Destroy(Item2);
+        }
+    }
     public void Jump(InputAction.CallbackContext context)
     {
         if (!context.performed) return;
@@ -210,6 +233,16 @@ public class Playercontroller : MonoBehaviour
         
     }
 
+    private void HIT()
+    {
+        anim.SetBool("run", false);
+        anim.SetBool("hit", true);
+        sound.PlayOneShotSound(clip2);  //ぶつかる音 
+        rb.velocity = new Vector2(-5, 0);
+        HitCount++;
+        time = 0;
+    }
+
     public void Awake()
     {
         if (Instance == null)
@@ -221,10 +254,8 @@ public class Playercontroller : MonoBehaviour
 
     IEnumerator Tspeed()
     {
-       
         //秒数待つ
         yield return new WaitForSeconds(4.0f);
-        
         topspeed = false;
     }
 
@@ -232,9 +263,9 @@ public class Playercontroller : MonoBehaviour
     {
         //秒数待つ
         yield return new WaitForSeconds(5.0f);
-
         badspped = false;
     }
+    
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -252,13 +283,7 @@ public class Playercontroller : MonoBehaviour
             }
             if (collision.gameObject.tag == "jama")
             {
-                anim.SetBool("run", false);
-                anim.SetBool("hit", true);
-                sound.PlayOneShotSound(clip2);  //ぶつかる音 
-                rb.velocity = new Vector2(-5, 0);
-
-                
-                time = 0;
+                HIT();
             }
 
             if (collision.gameObject.tag == "jamaup")
@@ -268,6 +293,7 @@ public class Playercontroller : MonoBehaviour
                 anim.SetBool("run", true);
                 anim.SetBool("jump", false);
                 anim.SetBool("fall", false);
+                HitCount++;
             }
 
             if(collision.gameObject.tag== "needle")
@@ -276,8 +302,8 @@ public class Playercontroller : MonoBehaviour
                 anim.SetBool("hit", true);
                 sound.PlayOneShotSound(clip2);  //ぶつかる音 
                 rb.velocity = new Vector2(-7, 0);
+                HitCount++;
 
-                
                 time = 0;
             }
             
@@ -285,12 +311,7 @@ public class Playercontroller : MonoBehaviour
             {
                 if (collision.gameObject.tag == "enemy")
                 {
-                    anim.SetBool("run", false);
-                    anim.SetBool("hit", true);
-                    sound.PlayOneShotSound(clip2);  //ぶつかる音 
-                    rb.velocity = new Vector2(-5, 0);
-                    
-                    time = 0;
+                    HIT();
                 }
             }
         }
@@ -298,19 +319,12 @@ public class Playercontroller : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-     
+
         if(collision.gameObject.tag=="jamaGround")
         {
-            anim.SetBool("run", false);
-            anim.SetBool("hit", true);
-            sound.PlayOneShotSound(clip2);  //ぶつかる音 
-            rb.velocity = new Vector2(-5, 0);
-
-            
-            time = 0;
+            HIT();
         }
         
-
         if (enemy.Instance3.funda == false)
         {
             if (collision.gameObject.tag == "enemybefore")
@@ -325,21 +339,16 @@ public class Playercontroller : MonoBehaviour
 
         if (collision.gameObject.tag == "shot")
         {
-            anim.SetBool("run", false);
-            anim.SetBool("hit", true);
-            sound.PlayOneShotSound(clip2);  //ぶつかる音 
-            rb.velocity = new Vector2(-5, 0);
-            
-            time = 0;
+            HIT();
         }
 
         if (collision.gameObject.tag == "pitfall")
         {
-        
-        
-          anim.SetBool("run", false);
-          anim.SetBool("hit", true);
-          time = 0;
+
+            HitCount++;
+            anim.SetBool("run", false);
+            anim.SetBool("hit", true);
+            time = 0;
         }
         if(collision.gameObject.tag == "Item1")
         {
@@ -352,44 +361,50 @@ public class Playercontroller : MonoBehaviour
         }
         if(collision.gameObject.tag == "Item2")
         {
+            Debug.Log("r");
+            anim.SetTrigger("warpa");
             
-
             transform.position = warppos[0].transform.position;
             change = true;
             sound.PlayOneShotSound(clip4);  //ワープ音 
+
             
-            
-            
+
         }
         if (collision.gameObject.tag == "Item2(1)")
         {
-
+            
+            anim.SetTrigger("warpa");
+            
             transform.position = warppos[1].transform.position;
             change = true;
             tutorialtext.warpText = true;
             sound.PlayOneShotSound(clip4);  //ワープ音 
+
             
-           
 
         }
         if (collision.gameObject.tag == "Item2(2)")
         {
-
+            
+            anim.SetTrigger("warpa");
+           
             transform.position = warppos[2].transform.position;
             change = true;
             sound.PlayOneShotSound(clip4);  //ワープ音 
-            
-            
+           
+
 
         }
         if (collision.gameObject.tag == "Item2(3)")
         {
-
+            anim.SetTrigger("warpa");
+            
             transform.position = warppos[3].transform.position;
             change = true;
             sound.PlayOneShotSound(clip4);  //ワープ音 
             
-            
+
 
         }
         if (collision.gameObject.tag=="Item3")
@@ -434,6 +449,8 @@ public class Playercontroller : MonoBehaviour
         }
     }
 
+   
+
     public void Attack(InputAction.CallbackContext context)
     {
         if (!context.performed) return;
@@ -455,7 +472,7 @@ public class Playercontroller : MonoBehaviour
                     CountDownTime = 3.0F; //カウントダウン開始
                     attackTime = 0;
                     
-                    timer.StartTimer();
+                    booltimer.StartTimer();
                 }
 
             }
@@ -482,7 +499,7 @@ public class Playercontroller : MonoBehaviour
                         canAttack = false;
                         CountDownTime = 3.0F; //カウントダウン開始
                         attackTime = 0;
-                        timer.StartTimer();
+                        booltimer.StartTimer();
                     }
                 }
             }

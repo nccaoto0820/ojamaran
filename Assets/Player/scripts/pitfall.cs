@@ -17,7 +17,7 @@ public class pitfall : MonoBehaviour
     private Rigidbody2D rb2 = null;
     private Animator anim2 = null;
 
-    public static parther instance2;
+    public static partner instance2;
 
     void Start()
     {

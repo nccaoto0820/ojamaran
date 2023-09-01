@@ -65,7 +65,7 @@ public class Wall : MonoBehaviour
         if (Playercontroller.Instance.start == true)
         {
             time += Time.deltaTime;
-            if (time >= 10)
+            if (time >= 11.5)
             {
                 if (CanWall == true)
                 {
@@ -94,7 +94,7 @@ public class Wall : MonoBehaviour
 
                             Onewall = true;
                             GameObject hits = Instantiate(WallPrefab, rayhitpos, Quaternion.identity);
-                            timer.StartTimer();
+                            
 
                             StartCoroutine("ReturnBullet");
 
@@ -127,8 +127,9 @@ public class Wall : MonoBehaviour
         //壁をでなくする
         isWall = false;
         CountDownTime = 10.0F; //カウントダウン開始
+        timer.StartTimer();
         //秒数待つ
-        yield return new WaitForSeconds(8.0f);
+        yield return new WaitForSeconds(7.5f);
         
         //壁出る
         isWall = true;

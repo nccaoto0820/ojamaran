@@ -20,7 +20,7 @@ public class PartnerWall : MonoBehaviour
 
     void Update()
     {
-        if (parther.Instances.tutoStart == true)
+        if (partner.Instances.tutoStart == true)
         {
             Vector2 origin = new Vector2(0, 0);
             Vector2 direction = new Vector2(0, -1);

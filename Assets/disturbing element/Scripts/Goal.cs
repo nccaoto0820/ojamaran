@@ -22,44 +22,54 @@ public class Goal : MonoBehaviour
     private EventSystem ES;
     [SerializeField] private GameObject Text;
     [SerializeField] private string GoalScenes;
+    [SerializeField]public PlayerGoal pg;
+
 
     //チュートリアル
     [SerializeField] public GameObject tuto;
     public TutorialText tutorialtext;
-    
+
+    [SerializeField] public bool Stage2;
+    [SerializeField]public static bool stage;
+
+    [SerializeField] public bool Stagetutorial;
+    [SerializeField] public static bool tutorialstage;
+    private void Update()
+    {
+        if(Stage2 == true)
+        {
+            stage = true;
+        }
+        else
+        {
+            stage = false;
+        }
+        if(Stagetutorial==true)
+        {
+            tutorialstage = true;
+        }
+        else
+        {
+            tutorialstage = false; 
+        }
+    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "Player")
         {
+            PlayerGoal.Playergoal= true;
             SceneManager.LoadScene(GoalScenes);
-            //goalUI.GetComponent<Text>();
-            //goalUI.SetActive(true);
-            //botton.SetActive(true);
-            //title.SetActive(true);
-            //Player.SetActive(false);
-            //Partner.SetActive(false);
-            //tutorialtext.goalText = true;
+           
+            goalUI.GetComponent<Text>();
             
-            //enemy.SetActive(false);
-            //sound.PlayOneShotSound(clip);  //クリア音 
-            //sound.BGM_Stop();   //　BGMを止める 
-            //EventSystem.current.SetSelectedGameObject(Text);
             
         }
         if (collision.gameObject.tag == "partner")
         {
-            gameovUI.GetComponent<Text>();
-            gameovUI.SetActive(true);
-            botton.SetActive(true);
-            title.SetActive(true);
-            Player.SetActive(false);
-            Partner.SetActive(false);
+            PlayerGoal.Playergoal = false;
+            SceneManager.LoadScene(GoalScenes);
             
-            enemy.SetActive(false);
-            sound.PlayOneShotSound(clip2);  //ゲームオーバー音 
-            sound.BGM_Stop();   //　BGMを止める 
-            EventSystem.current.SetSelectedGameObject(Text);
-            
+
         }
     }
 }

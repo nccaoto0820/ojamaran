@@ -14,15 +14,16 @@ public class Pausecon : MonoBehaviour
     void Update()
     {
         
-        if(Keyboard.current.pKey.wasPressedThisFrame)
-        {
-            //ステージごと変える
-            SceneManager.LoadScene("Stage2");
-        }
+        //if(Keyboard.current.pKey.wasPressedThisFrame)
+        //{
+        //    //ステージごと変える
+        //    SceneManager.LoadScene("Stage2");
+        //}
     }
 
     public void Pause(InputAction.CallbackContext context)
     {
+        Debug.Log("ttt");
         if (!context.performed) return;
         pause.SetActive(!pause.activeSelf);
 
